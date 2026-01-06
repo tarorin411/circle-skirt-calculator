@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta name="google-site-verification" content="xRQh6MFzMwW_LbgLPnFaOv6IG_5Fl6Pm4OpNqtFci0s" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>サーキュラースカート製図計算機 | 全円・半円スカートの生地用尺計算</title>
+    <meta name="description" content="ウエストとスカート丈を入力するだけで、サーキュラースカート（全円・半円）を作るための半径計算と、布の裁断図を自動作成。生地の必要用尺もわかります。">
+    <meta name="keywords" content="サーキュラースカート,全円スカート,半円スカート,型紙,製図,計算,生地,用尺,ハンドメイド,裁縫">
+
+    <!-- OGP -->
+    <meta property="og:title" content="サーキュラースカート製図計算機">
+    <meta property="og:description" content="ウエストと丈から半径を自動計算。裁断図イメージ付き。">
+    <meta property="og:type" content="website">
+
+    <!-- Schema.org 構造化データ -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "サーキュラースカート製図計算機",
+        "description": "ウエストとスカート丈を入力するだけで、サーキュラースカート（全円・半円）を作るための半径計算と、布の裁断図を自動作成。",
+        "applicationCategory": "UtilityApplication",
+        "operatingSystem": "All",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "JPY"
+        },
+        "featureList": [
+            "ウエスト半径の自動計算",
+            "全円・半円スカート対応",
+            "裁断図のビジュアル表示",
+            "必要生地サイズの計算",
+            "生地幅不足の警告表示"
+        ]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "サーキュラースカートの半径はどうやって計算する？",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "全円スカートの場合は「ウエスト ÷ (2 × π)」、半円スカートの場合は「ウエスト ÷ π」で計算します。例えばウエスト64cmの全円スカートなら、半径は約10.2cmになります。"
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "全円スカートと半円スカートの違いは？",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "全円スカートは360度の円形で、よりボリュームのあるドレープが特徴です。半円スカートは180度で、全円より控えめなフレアになります。生地の使用量も全円の方が多くなります。"
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "生地幅が足りない場合はどうする？",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "生地幅が足りない場合は、スカートを複数のパーツに分けて接ぎ合わせる必要があります。4枚接ぎや6枚接ぎなどの方法があります。"
+                }
+            }
+        ]
+    }
+    </script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Sans", sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f0f0;
+            color: #4a4a4a;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            font-size: 22px;
+            text-align: center;
+            color: #8e6e73;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 25px;
+        }
+
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #8e6e73;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #b8a0a4;
+            box-shadow: 0 0 0 3px rgba(142, 110, 115, 0.1);
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            margin: 0 auto;
+            border: 2px solid #e0d5d7;
+            background: #faf8f8;
+            width: 100%;
+            max-width: 500px;
+            height: 350px;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        .canvas-note {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: #8e6e73;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .result-box {
+            background: #f5f0f0;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+            border: 1px solid #e0d5d7;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .result-item {
+            min-width: 140px;
+        }
+
+        .result-label {
+            font-size: 12px;
+            color: #8e6e73;
+            margin-bottom: 5px;
+        }
+
+        .result-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #6d5257;
+        }
+
+        .result-unit {
+            font-size: 16px;
+            color: #8e6e73;
+        }
+
+        .result-detail {
+            font-size: 13px;
+            margin-top: 15px;
+            color: #666;
+        }
+
+        .warning {
+            color: #c62828;
+            font-weight: 600;
+            font-size: 13px;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(198, 40, 40, 0.08);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .btn-clear {
+            display: block;
+            width: 100%;
+            max-width: 180px;
+            margin: 20px auto 0;
+            padding: 12px;
+            background: #bbb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background: #999;
+        }
+
+        .input-hint {
+            font-size: 10px;
+            color: #999;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .options-panel {
+            background: #faf8f8;
+            border: 1px solid #e0d5d7;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .option-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .option-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #8e6e73;
+        }
+
+        .option-item label {
+            font-size: 13px;
+            color: #666;
+            cursor: pointer;
+            margin-bottom: 0;
+        }
+
+        .seam-note {
+            font-size: 11px;
+            color: #8e6e73;
+            margin-top: 8px;
+        }
+
+        .advice {
+            font-size: 12px;
+            color: #6a9a6e;
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(106, 154, 110, 0.1);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .tips-section {
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+
+        .tips-section h3 {
+            font-size: 15px;
+            color: #6d5257;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .tip-card {
+            background: #faf8f8;
+            border: 1px solid #e8e2e3;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .tip-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6d5257;
+            margin-bottom: 6px;
+        }
+
+        .tip-content {
+            font-size: 11px;
+            color: #777;
+            line-height: 1.6;
+        }
+
+        .affiliate-area {
+            margin-top: 30px;
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .affiliate-title {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .btn-shop {
+            display: inline-block;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            margin: 5px;
+            transition: all 0.2s;
+            color: white;
+        }
+
+        .btn-amazon {
+            background: #8e6e73;
+        }
+
+        .btn-rakuten {
+            background: #a35050;
+        }
+
+        .btn-shop:hover {
+            opacity: 0.85;
+        }
+
+        .site-footer {
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid #eee;
+        }
+
+        .footer-section {
+            margin-bottom: 20px;
+        }
+
+        .footer-section h4 {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .footer-section p {
+            font-size: 11px;
+            line-height: 1.7;
+            color: #888;
+            margin: 0 0 5px 0;
+        }
+
+        .footer-section a {
+            color: #8e6e73;
+        }
+
+        .copyright {
+            font-size: 10px;
+            text-align: center;
+            color: #aaa;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .result-number {
+                font-size: 36px;
+            }
+
+            .canvas-wrapper {
+                height: 280px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>🎀 サーキュラースカート計算機</h1>
+        <p class="subtitle">ウエストの半径計算＆裁断図シミュレーター</p>
+
+        <div class="control-panel">
+            <div class="input-group">
+                <label>スカートの種類</label>
+                <select id="type" onchange="draw()">
+                    <option value="full">全円 (360°)</option>
+                    <option value="half">半円 (180°)</option>
+                    <option value="quarter">1/4円 (90°)</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>ウエストサイズ (cm)</label>
+                <input type="number" id="waist" value="64" min="0" step="0.5" oninput="draw()">
+                <span class="input-hint">仕上がりサイズ（体のウエスト＋ゆとり）</span>
+            </div>
+            <div class="input-group">
+                <label>スカート丈 (cm)</label>
+                <input type="number" id="length" value="50" min="0" step="0.5" oninput="draw()">
+            </div>
+            <div class="input-group">
+                <label>生地幅 (cm)</label>
+                <input type="number" id="fabricWidth" value="110" min="0" oninput="draw()">
+                <span class="input-hint">一般的な生地: 90cm / 110cm / 140cm</span>
+            </div>
+        </div>
+
+        <div class="options-panel">
+            <div class="option-item">
+                <input type="checkbox" id="seamAllowance" onchange="draw()">
+                <label for="seamAllowance">縫い代を含める (+1.5cm)</label>
+            </div>
+            <div class="option-item">
+                <input type="checkbox" id="elasticWaist" onchange="draw()">
+                <label for="elasticWaist">ゴムウエスト用に補正 (+5cm)</label>
+            </div>
+            <div class="option-item">
+                <input type="checkbox" id="needLining" onchange="draw()">
+                <label for="needLining">裏地も計算に含める (×2)</label>
+            </div>
+        </div>
+
+        <div class="canvas-wrapper">
+            <canvas id="myCanvas"></canvas>
+            <div class="canvas-note">※布を4つ折りにしたイメージ（1/4展開図）</div>
+        </div>
+
+        <div class="result-box">
+            <div class="result-row">
+                <div class="result-item">
+                    <div class="result-label">ウエストライン半径 (r)</div>
+                    <span class="result-number" id="rVal">0</span>
+                    <span class="result-unit">cm</span>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">中心から裾までの全長</div>
+                    <span class="result-number" id="totalLen">0</span>
+                    <span class="result-unit">cm</span>
+                </div>
+            </div>
+            <div class="result-detail">
+                必要生地サイズ: 約 <strong><span id="needH">0</span>cm × <span id="needW">0</span>cm</strong>
+                <span id="liningNote" style="display:none;"> (裏地込み)</span>
+            </div>
+            <div id="seamNote" class="seam-note" style="display:none;">
+                ※縫い代+1.5cmが含まれています
+            </div>
+            <div id="warnMsg" class="warning">⚠️ 生地幅が足りません</div>
+            <div id="adviceMsg" class="advice"></div>
+        </div>
+
+        <button class="btn-clear" onclick="clearAll()">クリア</button>
+
+        <div class="tips-section">
+            <h3>📌 製作のポイント</h3>
+            <div class="tips-grid">
+                <div class="tip-card">
+                    <div class="tip-title">「わ」とは？</div>
+                    <div class="tip-content">布を折った折り目のこと。「わで取る」=折り目に型紙を当てて切ると左右対称のパーツが作れます。</div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">縫い代について</div>
+                    <div class="tip-content">ウエスト・裾それぞれに1〜1.5cmの縫い代が必要です。上のオプションで自動計算できます。</div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">生地の方向</div>
+                    <div class="tip-content">布は「タテ地」と「ヨコ地」で伸びが違います。スカートはタテ地（耳に平行）で裁断するのが基本です。</div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">水通しのすすめ</div>
+                    <div class="tip-content">綿やリネンは洗うと縮みます。裁断前に一度水に浸けて乾かす「水通し」をすると安心です。</div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">生地は多めに</div>
+                    <div class="tip-content">計算結果より10〜15%多めに購入すると、柄合わせやカットミスに対応できます。</div>
+                </div>
+                <div class="tip-card">
+                    <div class="tip-title">透ける生地には裏地を</div>
+                    <div class="tip-content">シフォンや薄手のリネンなど透け感のある生地は、裏地を付けると上品な仕上がりに。</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="affiliate-area">
+            <p class="affiliate-title">美しいドレープを作るために</p>
+            <a href="https://www.amazon.co.jp/s?k=ロータリーカッター&tag=YOUR_ID" target="_blank" class="btn-shop btn-amazon">
+                ロータリーカッターを探す ➔
+            </a>
+            <a href="https://search.rakuten.co.jp/search/mall/リネン生地/" target="_blank" class="btn-shop btn-rakuten">
+                楽天で生地を見る ➔
+            </a>
+        </div>
+
+        <footer class="site-footer">
+            <div class="footer-section">
+                <h4>プライバシーポリシー</h4>
+                <p>当サイトでは、Googleアナリティクス等のアクセス解析ツールを使用しています。これらのツールはCookieを使用してデータを収集しますが、個人を特定する情報は含まれません。</p>
+            </div>
+            <div class="footer-section">
+                <h4>免責事項</h4>
+                <p>当サイトの計算結果は参考値であり、実際の使用状況により異なる場合があります。当サイトを利用したことによる損害について、運営者は一切の責任を負いません。</p>
+                <p>当サイトはAmazonアソシエイトプログラムに参加しています。</p>
+            </div>
+            <div class="footer-section">
+                <h4>運営者情報</h4>
+                <p>運営者: LJO<br>
+                    お問い合わせ: <a href="mailto:lstar.ojousama@gmail.com">lstar.ojousama@gmail.com</a></p>
+            </div>
+            <p class="copyright">© 2026 LJO. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const wrapper = document.querySelector('.canvas-wrapper');
+            canvas.width = wrapper.clientWidth;
+            canvas.height = wrapper.clientHeight - 30;
+            draw();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function draw() {
+            const type = document.getElementById('type').value;
+            let waist = parseFloat(document.getElementById('waist').value) || 0;
+            let length = parseFloat(document.getElementById('length').value) || 0;
+            const fWidth = parseFloat(document.getElementById('fabricWidth').value) || 0;
+
+            // オプション取得
+            const seamAllowance = document.getElementById('seamAllowance').checked;
+            const elasticWaist = document.getElementById('elasticWaist').checked;
+            const needLining = document.getElementById('needLining').checked;
+
+            // ゴムウエスト補正
+            if (elasticWaist) {
+                waist += 5;
+            }
+
+            // 半径の計算
+            let radius;
+            let typeName;
+            if (type === 'full') {
+                radius = waist / (2 * Math.PI);
+                typeName = '全円';
+            } else if (type === 'half') {
+                radius = waist / Math.PI;
+                typeName = '半円';
+            } else {
+                radius = waist / (0.5 * Math.PI);
+                typeName = '1/4円';
+            }
+
+            // 縫い代を含める
+            if (seamAllowance) {
+                length += 1.5; // 裾の縫い代
+            }
+
+            const rDisplay = Math.round(radius * 10) / 10;
+            const totalLen = radius + length;
+            const totalLenDisplay = Math.round(totalLen * 10) / 10;
+
+            // 必要生地サイズ
+            let needSize = Math.ceil(totalLen * 2);
+
+            // 裏地が必要な場合は2倍
+            if (needLining) {
+                needSize = needSize * 2;
+            }
+
+            // 表示更新
+            document.getElementById('rVal').innerText = rDisplay;
+            document.getElementById('totalLen').innerText = totalLenDisplay;
+            document.getElementById('needH').innerText = needSize;
+            document.getElementById('needW').innerText = Math.ceil(totalLen * 2);
+
+            // 縫い代・裏地の注記
+            document.getElementById('seamNote').style.display = seamAllowance ? 'block' : 'none';
+            document.getElementById('liningNote').style.display = needLining ? 'inline' : 'none';
+
+            // 警告・アドバイスチェック
+            const warn = document.getElementById('warnMsg');
+            const advice = document.getElementById('adviceMsg');
+
+            if (totalLen > fWidth) {
+                warn.style.display = 'block';
+                warn.innerText = `⚠️ 半径+丈(${totalLenDisplay}cm)が生地幅(${fWidth}cm)を超えています。`;
+                // 接ぎ枚数のアドバイス
+                advice.style.display = 'block';
+                advice.innerText = `💡 ヒント: 4枚接ぎまたは6枚接ぎで製作できます。各パーツを別々にカットして縫い合わせましょう。`;
+            } else {
+                warn.style.display = 'none';
+                advice.style.display = 'none';
+            }
+
+            // Canvas描画
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (totalLen <= 0) return;
+
+            const padding = 50;
+            const availableSize = Math.min(canvas.width, canvas.height) - padding * 2;
+            const scale = availableSize / (totalLen * 1.15);
+
+            ctx.save();
+            ctx.translate(padding, padding);
+
+            // 背景の布イメージ
+            ctx.fillStyle = 'rgba(200, 180, 185, 0.12)';
+            ctx.fillRect(0, 0, totalLen * scale, totalLen * scale);
+
+            // ウエストライン（内側の円弧）- 太い実線
+            ctx.beginPath();
+            ctx.arc(0, 0, radius * scale, 0, 0.5 * Math.PI);
+            ctx.strokeStyle = '#6d5257';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+
+            // 裾ライン（外側の円弧）- 破線
+            ctx.beginPath();
+            ctx.arc(0, 0, totalLen * scale, 0, 0.5 * Math.PI);
+            ctx.strokeStyle = '#8e6e73';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([6, 4]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // わの線（折り目）
+            ctx.strokeStyle = '#bbb';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(totalLen * scale + 10, 0);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, totalLen * scale + 10);
+            ctx.stroke();
+
+            // ===== 寸法線の描画 =====
+            const dimLineOffset = 12; // 寸法線のオフセット
+
+            // --- 半径(r)の寸法線: 中心 → ウエストライン（水平方向）---
+            const rLineY = -dimLineOffset;
+            ctx.strokeStyle = '#6d5257';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(0, rLineY);
+            ctx.lineTo(radius * scale, rLineY);
+            ctx.stroke();
+            // 矢印（両端）
+            drawArrow(ctx, 0, rLineY, 5, 'right');
+            drawArrow(ctx, radius * scale, rLineY, 5, 'left');
+            // 中心の点
+            ctx.fillStyle = '#6d5257';
+            ctx.beginPath();
+            ctx.arc(0, 0, 4, 0, Math.PI * 2);
+            ctx.fill();
+            // ラベル
+            ctx.font = 'bold 12px Arial';
+            ctx.fillStyle = '#6d5257';
+            ctx.fillText(`r = ${rDisplay}cm`, radius * scale / 2 - 25, rLineY - 6);
+
+            // --- 丈の寸法線: ウエストライン → 裾（斜め方向）---
+            const dimAngle = Math.PI / 6; // 30度方向
+            const rX = Math.cos(dimAngle) * radius * scale;
+            const rY = Math.sin(dimAngle) * radius * scale;
+            const hemX = Math.cos(dimAngle) * totalLen * scale;
+            const hemY = Math.sin(dimAngle) * totalLen * scale;
+
+            ctx.strokeStyle = '#8e6e73';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(rX, rY);
+            ctx.lineTo(hemX, hemY);
+            ctx.stroke();
+            // 矢印（両端）
+            drawArrowAngled(ctx, rX, rY, 5, dimAngle + Math.PI);
+            drawArrowAngled(ctx, hemX, hemY, 5, dimAngle);
+            // ラベル
+            ctx.font = 'bold 12px Arial';
+            ctx.fillStyle = '#8e6e73';
+            const midX = (rX + hemX) / 2;
+            const midY = (rY + hemY) / 2;
+            ctx.fillText(`丈 ${length}cm`, midX + 8, midY - 5);
+
+            // わ表示
+            ctx.fillStyle = '#999';
+            ctx.font = '10px Arial';
+            ctx.fillText('わ', totalLen * scale / 2 - 5, -20);
+            ctx.save();
+            ctx.rotate(-Math.PI / 2);
+            ctx.fillText('わ', -totalLen * scale / 2 - 5, -20);
+            ctx.restore();
+
+            ctx.restore();
+        }
+
+        // 矢印を描画する関数（水平用）
+        function drawArrow(ctx, x, y, size, direction) {
+            ctx.beginPath();
+            if (direction === 'right') {
+                ctx.moveTo(x, y);
+                ctx.lineTo(x + size, y - size / 2);
+                ctx.lineTo(x + size, y + size / 2);
+            } else {
+                ctx.moveTo(x, y);
+                ctx.lineTo(x - size, y - size / 2);
+                ctx.lineTo(x - size, y + size / 2);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // 矢印を描画する関数（角度指定用）
+        function drawArrowAngled(ctx, x, y, size, angle) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-size, -size / 2);
+            ctx.lineTo(-size, size / 2);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function clearAll() {
+            document.getElementById('type').selectedIndex = 0;
+            document.getElementById('waist').value = '64';
+            document.getElementById('length').value = '50';
+            document.getElementById('fabricWidth').value = '110';
+            document.getElementById('seamAllowance').checked = false;
+            document.getElementById('elasticWaist').checked = false;
+            document.getElementById('needLining').checked = false;
+            draw();
+        }
+
+        // 初期化
+        window.onload = function () {
+            resizeCanvas();
+        };
+    </script>
+
+</body>
+
+</html>
